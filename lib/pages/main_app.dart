@@ -1,9 +1,8 @@
 import 'package:contact_picker/services/contact_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../components/contact_detail.dart';
+import '../components/contact_term.dart';
 
 class MainAPP extends StatefulHookConsumerWidget {
   final ContactService contactService;
@@ -32,44 +31,37 @@ class _MainAPPState extends ConsumerState<MainAPP> {
 
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('聯絡人複製')),
+        appBar: AppBar(title: const Text('聯絡人管理')),
         body: _body(
-          contacts: contacts.list,
-          permissionDenied: contacts.permissionDenied,
+          contacts: contacts,
         ),
       ),
     );
   }
 
   Widget _body({
-    required List<Contact> contacts,
-    required bool permissionDenied,
+    required Contacts contacts,
   }) {
-    if (permissionDenied) {
+    if (contacts.permissionDenied) {
       return const Center(
         child: Text('Permission denied'),
       );
     }
-    if (contacts.isEmpty) {
+    if (contacts.list.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
     return ListView.builder(
-      itemCount: contacts.length,
-      itemBuilder: (context, i) => ListTile(
-        title: Text(contacts[i].displayName),
-        onTap: () async {
-          final fullContact = await FlutterContacts.getContact(
-            contacts[i].id,
-          );
-          await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => ContactDetail(
-                contact: fullContact!,
-              ),
-            ),
-          );
+      itemCount: contacts.list.length,
+      itemBuilder: (context, i) => ContactTerm(
+        contact: contacts.list[i],
+        selectedIdList: contacts.selectedIdList,
+        onChange: () {
+          var contactsNotifier =
+              ref.read(widget.contactService.contacts.notifier);
+
+          contactsNotifier.addSelect(contacts.list[i]);
         },
       ),
     );

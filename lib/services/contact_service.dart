@@ -19,11 +19,12 @@ class ContactService {
 }
 
 class ContactsNotifier extends StateNotifier<Contacts> {
-  ContactsNotifier() : super(Contacts(list: [], permissionDenied: false));
+  ContactsNotifier() : super(Contacts.initail());
 
   void setPermissionDenied() {
     final contacts = Contacts.copy(
       list: state.list,
+      selectedIdList: state.selectedIdList,
       permissionDenied: true,
     );
     state = contacts;
@@ -32,6 +33,7 @@ class ContactsNotifier extends StateNotifier<Contacts> {
   void addContact(Contact contact) {
     final contacts = Contacts.copy(
       list: state.list,
+      selectedIdList: state.selectedIdList,
       permissionDenied: state.permissionDenied,
     );
     contacts.list.add(contact);
@@ -41,27 +43,56 @@ class ContactsNotifier extends StateNotifier<Contacts> {
   void resetList(List<Contact> contactList) {
     final contacts = Contacts.copy(
       list: contactList,
+      selectedIdList: state.selectedIdList,
       permissionDenied: state.permissionDenied,
     );
+    state = contacts;
+  }
+
+  void addSelect(Contact contact) {
+    final contacts = Contacts.copy(
+      list: state.list,
+      selectedIdList: state.selectedIdList,
+      permissionDenied: state.permissionDenied,
+    );
+
+    if (contacts.selectedIdList.contains(contact.id)) {
+      contacts.selectedIdList.remove(contact.id);
+    } else {
+      contacts.selectedIdList.add(contact.id);
+    }
+
     state = contacts;
   }
 }
 
 class Contacts {
   List<Contact> list;
+  List<String> selectedIdList;
   bool permissionDenied;
 
   Contacts({
     required this.list,
+    required this.selectedIdList,
     required this.permissionDenied,
   });
 
+  factory Contacts.initail() {
+    return Contacts(
+      list: [],
+      selectedIdList: [],
+      permissionDenied: false,
+    );
+  }
+
   factory Contacts.copy({
-    required list,
-    required permissionDenied,
+    required List<Contact> list,
+    required List<String> selectedIdList,
+    required bool permissionDenied,
   }) {
     return Contacts(
       list: list,
+      selectedIdList: selectedIdList,
       permissionDenied: permissionDenied,
     );
   }
