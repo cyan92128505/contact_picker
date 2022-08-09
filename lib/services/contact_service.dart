@@ -1,5 +1,9 @@
+import 'package:contact_picker/services/file_service.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../models/contacts.dart';
 
 class ContactService {
   final contacts = StateNotifierProvider<ContactsNotifier, Contacts>(
@@ -12,7 +16,13 @@ class ContactService {
     if (!await FlutterContacts.requestPermission(readonly: true)) {
       state.setPermissionDenied();
     } else {
-      final contactList = await FlutterContacts.getContacts();
+      final contactList = await FlutterContacts.getContacts(
+        withAccounts: true,
+        withGroups: true,
+        withPhoto: true,
+        withProperties: true,
+        withThumbnail: true,
+      );
       state.resetList(contactList);
     }
   }
@@ -30,13 +40,42 @@ class ContactsNotifier extends StateNotifier<Contacts> {
     state = contacts;
   }
 
-  void addContact(Contact contact) {
+  void addContact(Contact contact) async {
     final contacts = Contacts.copy(
       list: state.list,
       selectedIdList: state.selectedIdList,
       permissionDenied: state.permissionDenied,
     );
+
+    await FlutterContacts.insertContact(contact);
+
     contacts.list.add(contact);
+    state = contacts;
+  }
+
+  void removeContact(Contact contact) async {
+    final contacts = Contacts.copy(
+      list: state.list,
+      selectedIdList: state.selectedIdList,
+      permissionDenied: state.permissionDenied,
+    );
+
+    await FlutterContacts.deleteContact(contact);
+
+    contacts.list.remove(contact);
+    state = contacts;
+  }
+
+  void removeSelectContact(Contact contact) async {
+    final contacts = Contacts.copy(
+      list: state.list,
+      selectedIdList: state.selectedIdList,
+      permissionDenied: state.permissionDenied,
+    );
+
+    await FlutterContacts.deleteContacts([contact]);
+
+    contacts.list.remove(contact);
     state = contacts;
   }
 
@@ -64,36 +103,21 @@ class ContactsNotifier extends StateNotifier<Contacts> {
 
     state = contacts;
   }
-}
 
-class Contacts {
-  List<Contact> list;
-  List<String> selectedIdList;
-  bool permissionDenied;
-
-  Contacts({
-    required this.list,
-    required this.selectedIdList,
-    required this.permissionDenied,
-  });
-
-  factory Contacts.initail() {
-    return Contacts(
-      list: [],
-      selectedIdList: [],
-      permissionDenied: false,
+  void sharedVcardList() async {
+    final contacts = Contacts.copy(
+      list: state.list,
+      selectedIdList: state.selectedIdList,
+      permissionDenied: state.permissionDenied,
     );
-  }
 
-  factory Contacts.copy({
-    required List<Contact> list,
-    required List<String> selectedIdList,
-    required bool permissionDenied,
-  }) {
-    return Contacts(
-      list: list,
-      selectedIdList: selectedIdList,
-      permissionDenied: permissionDenied,
+    final result = contacts.getVcardList();
+    final fileService = FileService();
+    final file = await fileService.writeFile(
+      fileName: '${DateTime.now().toIso8601String()}.vcf',
+      value: result,
     );
+
+    await Share.shareFiles([file.path]);
   }
 }

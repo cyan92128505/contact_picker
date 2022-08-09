@@ -2,7 +2,9 @@ import 'package:contact_picker/services/contact_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../components/action_bar.dart';
 import '../components/contact_term.dart';
+import '../models/contacts.dart';
 
 class MainAPP extends StatefulHookConsumerWidget {
   final ContactService contactService;
@@ -31,9 +33,17 @@ class _MainAPPState extends ConsumerState<MainAPP> {
 
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('聯絡人管理')),
+        appBar: AppBar(
+          title: ActionBar(
+            contactsProvider: widget.contactService.contacts,
+          ),
+        ),
         body: _body(
           contacts: contacts,
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.add),
         ),
       ),
     );

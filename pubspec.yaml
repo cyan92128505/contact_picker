@@ -37,6 +37,12 @@ dependencies:
   flutter_contacts: ^1.1.5
   flutter_hooks: ^0.18.0
   hooks_riverpod: ^2.0.0-dev.9
+  flutter_fast_forms: ^7.2.1
+  flutter_slidable: ^2.0.0
+  share_plus: ^4.0.10
+  confirm_dialog: ^1.0.1
+  path_provider: ^2.0.11
+  file_picker: ^5.0.1
 
 
 dev_dependencies:

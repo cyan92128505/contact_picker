@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
-import 'contact_detail.dart';
+import '../pages/contact_detail.dart';
 
 class ContactTerm extends StatelessWidget {
   final Contact contact;
@@ -31,38 +32,30 @@ class ContactTerm extends StatelessWidget {
     return contact.id;
   }
 
-  Widget get avatar {
-    if (contact.photoOrThumbnail == null) {
-      return Container();
-    }
-
-    return CircleAvatar(
-      child: Image.memory(contact.photoOrThumbnail!),
-    );
-  }
-
   bool get isSelected {
     return selectedIdList.contains(contact.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      tileColor: isSelected ? Colors.black12 : Colors.white,
-      title: Text(contectDisplayTitle),
-      onLongPress: () => FlutterContacts.getContact(
-        contact.id,
-      ).then(
-        (fullContact) => displayDetial(
-          context,
-          fullContact: fullContact!,
+    return Slidable(
+      child: ListTile(
+        tileColor: isSelected ? Colors.black12 : Colors.white,
+        title: Text(contectDisplayTitle),
+        onLongPress: () => FlutterContacts.getContact(
+          contact.id,
+        ).then(
+          (fullContact) => displayDetial(
+            context,
+            fullContact: fullContact!,
+          ),
         ),
+        onTap: () => onChange(),
       ),
-      onTap: () => onChange(),
     );
   }
 
-  displayDetial(
+  void displayDetial(
     BuildContext context, {
     required Contact fullContact,
   }) {
