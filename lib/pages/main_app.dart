@@ -32,6 +32,7 @@ class _MainAPPState extends ConsumerState<MainAPP> {
     );
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: ActionBar(

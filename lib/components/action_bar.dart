@@ -21,36 +21,57 @@ class ActionBar extends HookConsumerWidget {
       Expanded(
         child: Text('聯絡人管理 (${contacts.list.length})'),
       ),
-      TextButton(
-        style: TextButton.styleFrom(primary: Colors.white),
-        child: const Text('匯出'),
-        onPressed: () {
-          var contactsNotifier = ref.read(contactsProvider.notifier);
-          contactsNotifier.sharedVcardList();
-        },
-      ),
-      TextButton(
-        style: TextButton.styleFrom(primary: Colors.white),
-        child: const Text('匯入'),
-        onPressed: () {},
-      ),
-      TextButton(
-        style: TextButton.styleFrom(primary: Colors.white),
-        child: const Text('刪除'),
-        onPressed: () async {
-          if (contacts.selectedIdList.isEmpty) {
-            return;
-          }
-          if (await confirm(
-            context,
-            title: const Text('刪除'),
-            content: const Text('確認刪除所選擇的聯絡人?'),
-            textOK: const Text('是'),
-            textCancel: const Text('否'),
-          )) {
-            return print('pressedOK');
-          }
-          return print('pressedCancel');
+      PopupMenuButton(
+        itemBuilder: (context) {
+          return [
+            PopupMenuItem(
+              child: TextButton(
+                child: const Text('匯出'),
+                onPressed: () async {
+                  Future.delayed(Duration.zero).then(
+                    (value) => Navigator.pop(context),
+                  );
+                  var contactsNotifier = ref.read(contactsProvider.notifier);
+                  await contactsNotifier.sharedVcardList();
+                },
+              ),
+            ),
+            PopupMenuItem(
+              child: TextButton(
+                child: const Text('匯入'),
+                onPressed: () {
+                  Future.delayed(Duration.zero).then(
+                    (value) => Navigator.pop(context),
+                  );
+                },
+              ),
+            ),
+            PopupMenuItem(
+              child: TextButton(
+                child: const Text('刪除'),
+                onPressed: () async {
+                  Future.delayed(Duration.zero).then(
+                    (value) => Navigator.pop(context),
+                  );
+                  if (contacts.selectedIdList.isEmpty) {
+                    return;
+                  }
+                  final result = await confirm(
+                    context,
+                    title: const Text('刪除'),
+                    content: const Text('確認刪除所選擇的聯絡人?'),
+                    textOK: const Text('是'),
+                    textCancel: const Text('否'),
+                  );
+
+                  if (result == true) {
+                    return print('pressedOK');
+                  }
+                  return print('pressedCancel');
+                },
+              ),
+            ),
+          ];
         },
       ),
     ]);

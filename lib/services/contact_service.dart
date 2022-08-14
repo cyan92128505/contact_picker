@@ -104,7 +104,7 @@ class ContactsNotifier extends StateNotifier<Contacts> {
     state = contacts;
   }
 
-  void sharedVcardList() async {
+  sharedVcardList() async {
     final contacts = Contacts.copy(
       list: state.list,
       selectedIdList: state.selectedIdList,
