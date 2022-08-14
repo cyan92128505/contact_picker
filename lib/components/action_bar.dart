@@ -39,10 +39,12 @@ class ActionBar extends HookConsumerWidget {
             PopupMenuItem(
               child: TextButton(
                 child: const Text('匯入'),
-                onPressed: () {
+                onPressed: () async {
                   Future.delayed(Duration.zero).then(
                     (value) => Navigator.pop(context),
                   );
+                  var contactsNotifier = ref.read(contactsProvider.notifier);
+                  await contactsNotifier.importVcardList();
                 },
               ),
             ),

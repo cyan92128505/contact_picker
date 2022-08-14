@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:contact_picker/services/file_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
@@ -119,5 +122,17 @@ class ContactsNotifier extends StateNotifier<Contacts> {
     );
 
     await Share.shareFiles([file.path]);
+  }
+
+  importVcardList() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result == null) {
+      return;
+    }
+
+    File file = File(result.files.single.path!);
+
+    final content = await file.readAsString();
+    print(content);
   }
 }
